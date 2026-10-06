@@ -1,0 +1,10 @@
+# secrets
+.env
+.env.*
+# bundled deps and build output
+server/lib/
+dist/
+*.mcpb
+__pycache__/
+*.pyc
+.venv/

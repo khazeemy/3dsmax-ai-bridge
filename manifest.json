@@ -1,0 +1,122 @@
+{
+  "manifest_version": "0.4",
+  "name": "3dsmax-ai-bridge",
+  "display_name": "3ds Max AI Bridge",
+  "version": "0.3.0",
+  "description": "Lets Claude model, lay out, optimise and frame cameras in your live 3ds Max scene.",
+  "long_description": "Connects Claude Desktop to a running 3ds Max session over a local socket (127.0.0.1 only). Claude can read the scene and current selection, list and apply materials, and run MAXScript directly against the open scene.\n\nRequires Windows and 3ds Max 2025 or newer, with the bridge listener installed inside 3ds Max (run Step1_Install_in_3dsMax.ms from the release package once). In the AI Bridge panel inside 3ds Max you choose which tools Claude may use. Each change is one undo step in 3ds Max; execute_maxscript can change or delete anything in the open scene, so save your work first.",
+  "author": {
+    "name": "Gamer Architect Labs",
+    "url": "https://gamerarchlabs.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "3ds max",
+    "3dsmax",
+    "maxscript",
+    "archviz",
+    "cgi",
+    "materials",
+    "pymxs"
+  ],
+  "server": {
+    "type": "uv",
+    "entry_point": "server/max_bridge_server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${__dirname}",
+        "server/max_bridge_server.py"
+      ]
+    }
+  },
+  "tools": [
+    {
+      "name": "get_scene_state",
+      "description": "Get a full snapshot of the current 3ds Max scene: every top-level object, its class (Box, Editable_Poly, Camera, etc), assigned material, modifier stack, and position. Use this to understand what's in the scene before deciding on any action."
+    },
+    {
+      "name": "list_selection",
+      "description": "Get the objects currently selected in the 3ds Max viewport. Use this to understand what the user is actively working on right now."
+    },
+    {
+      "name": "list_materials",
+      "description": "List all materials currently available in the scene's material library. Use this before apply_material to confirm exact material names and to reason about which material best matches which object."
+    },
+    {
+      "name": "apply_material",
+      "description": "Apply a named material to one or more named objects in the scene."
+    },
+    {
+      "name": "execute_maxscript",
+      "description": "Execute a block of MAXScript code directly against the live 3ds Max scene - anything from a single property change to a full multi-line script (rollouts, function definitions, object creation, createDialog). Returns the script's final expression as a string, or the real MAXScript error text if it fails."
+    },
+    {
+      "name": "get_object_properties",
+      "description": "Get full details of one object: position, rotation (degrees), scale, bounding box and size, face/vertex count, layer, material, parent and children, every base-object parameter with its current value, and each modifier (index 0 = top of the stack) with its parameters. Also returns the scene's system units."
+    },
+    {
+      "name": "create_object",
+      "description": "Create one object of any creatable 3ds Max class: geometry (Box, Sphere, Cylinder, Cone, Torus, Tube, Pyramid, Plane, GeoSphere, ChamferBox, ChamferCyl, Teapot...), shapes (Rectangle, Circle, Arc, Text, Helix...), lights, cameras or helpers (Point, Dummy)."
+    },
+    {
+      "name": "create_spline",
+      "description": "Draw a spline shape from point lists - outlines, floor plans, paths, profiles for Extrude/Lathe/Sweep, or paths for copy_along_spline."
+    },
+    {
+      "name": "transform_objects",
+      "description": "Move, rotate and/or scale objects."
+    },
+    {
+      "name": "set_object_properties",
+      "description": "Change parameters on an object, or on one of its modifiers."
+    },
+    {
+      "name": "add_modifier",
+      "description": "Add a modifier to the top of each object's stack."
+    },
+    {
+      "name": "clone_objects",
+      "description": "Clone objects in an array: copy k is moved by k * offset and rotated by k * rotation_step (degrees, about its own pivot)."
+    },
+    {
+      "name": "delete_objects",
+      "description": "Delete objects. The user can undo it in 3ds Max (Ctrl+Z). Confirm with the user first unless they asked for this exact deletion."
+    },
+    {
+      "name": "capture_viewport",
+      "description": "Take a picture of the active 3ds Max viewport (or a camera's view, with safe frames showing the render area) and return it as an image, so you can see what the scene looks like."
+    },
+    {
+      "name": "create_reference_plane",
+      "description": "Model from an image: put a reference image on a plane in the scene, sized to the image's aspect ratio, facing the given viewport, shown in the viewport, not renderable and frozen (so it can't be picked by accident)."
+    },
+    {
+      "name": "copy_along_spline",
+      "description": "Place copies of objects along a drawn spline (fences, railings, columns, street lights, trees along a path, chairs around a curve). Works on every sub-spline of the shape unless spline_index is given."
+    },
+    {
+      "name": "analyze_scene",
+      "description": "Check the scene for performance problems without changing anything: face totals and the heaviest objects, identical objects that are not instanced (and how many faces instancing would save), TurboSmooth / MeshSmooth with high viewport iterations, objects over heavy_face_threshold faces (proxy candidates), missing texture files, duplicate material names, empty objects and empty layers - with recommendations."
+    },
+    {
+      "name": "optimize_scene",
+      "description": "Apply safe optimisations. Runs as a preview (dry_run true) by default: show the user what would change, and only call again with dry_run false once they agree. Applying is one undo step in 3ds Max."
+    },
+    {
+      "name": "create_camera_view",
+      "description": "View finder: create a targeted Physical camera that frames the subject(s) - the current selection unless subject_names is given - computing the distance so the whole subject fits the render frame."
+    }
+  ],
+  "tools_generated": false,
+  "compatibility": {
+    "platforms": [
+      "win32"
+    ],
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  }
+}
